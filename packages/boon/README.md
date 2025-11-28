@@ -141,20 +141,17 @@ BOON uses a compact binary format with:
 | Float32 | `0x20` | IEEE 754 single precision |
 | Float64 | `0x21` | IEEE 754 double precision |
 | String (empty) | `0x30` | Empty string |
-| String (tiny) | `0x31-0x4F` | 1-31 byte strings |
-| String (short) | `0x32` | 32-255 byte strings |
-| String (medium) | `0x33` | 256-65535 byte strings |
-| String (long) | `0x34` | >65535 byte strings |
+| String (short) | `0x31` | 1-255 byte strings |
+| String (medium) | `0x32` | 256-65535 byte strings |
+| String (long) | `0x33` | >65535 byte strings |
 | Array (empty) | `0x40` | Empty array |
-| Array (tiny) | `0x41-0x4F` | 1-15 element arrays |
-| Array (short) | `0x42` | 16-255 element arrays |
-| Array (medium) | `0x43` | 256-65535 element arrays |
-| Array (long) | `0x44` | >65535 element arrays |
+| Array (short) | `0x41` | 1-255 element arrays |
+| Array (medium) | `0x42` | 256-65535 element arrays |
+| Array (long) | `0x43` | >65535 element arrays |
 | Object (empty) | `0x50` | Empty object |
-| Object (tiny) | `0x51-0x5F` | 1-15 key objects |
-| Object (short) | `0x52` | 16-255 key objects |
-| Object (medium) | `0x53` | 256-65535 key objects |
-| Object (long) | `0x54` | >65535 key objects |
+| Object (short) | `0x51` | 1-255 key objects |
+| Object (medium) | `0x52` | 256-65535 key objects |
+| Object (long) | `0x53` | >65535 key objects |
 
 ### Size Efficiency
 
