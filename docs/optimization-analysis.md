@@ -203,7 +203,8 @@ function collectKeys(value: JsonValue, keys: Set<string>): void {
     for (const item of value) {
       collectKeys(item, keys)
     }
-  } else if (value !== null && typeof value === 'object') {
+  }
+  else if (value !== null && typeof value === 'object') {
     for (const [key, val] of Object.entries(value)) {
       keys.add(key)
       collectKeys(val, keys)
@@ -219,20 +220,20 @@ function encodeValue(value: JsonValue, options: EncodeOptions): Uint8Array {
   // Collect all keys
   const keys = new Set<string>()
   collectKeys(value, keys)
-  
+
   // Create key map
   const keyMap = new Map<string, number>()
   let index = 0
   for (const key of keys) {
     keyMap.set(key, index++)
   }
-  
+
   // Write header with string table
   writeStringTableHeader(buf, keys)
-  
+
   // Encode value with key references
   writeValueWithKeyMap(buf, value, keyMap)
-  
+
   return buf.getBytes()
 }
 ```

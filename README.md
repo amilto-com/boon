@@ -202,6 +202,10 @@ See the [BOON README](./packages/boon/README.md) for complete API documentation.
 
 ---
 
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines. **All contributions must be in English.**
+
 ## Credits
 
 - Logo design by [鈴木ックス(SZKX)](https://x.com/szkx_art)
