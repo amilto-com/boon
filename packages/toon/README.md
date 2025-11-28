@@ -1,38 +1,12 @@
 ![TOON logo with step‑by‑step guide](./.github/og.png)
 
-# TOON & BOON - AI-Optimized Data Formats
+# Token-Oriented Object Notation (TOON)
 
 [![CI](https://github.com/toon-format/toon/actions/workflows/ci.yml/badge.svg)](https://github.com/toon-format/toon/actions)
 [![npm version](https://img.shields.io/npm/v/@toon-format/toon.svg?labelColor=1b1b1f&color=fef3c0)](https://www.npmjs.com/package/@toon-format/toon)
 [![SPEC v3.0](https://img.shields.io/badge/spec-v3.0-fef3c0?labelColor=1b1b1f)](https://github.com/toon-format/spec)
 [![npm downloads (total)](https://img.shields.io/npm/dt/@toon-format/toon.svg?labelColor=1b1b1f&color=fef3c0)](https://www.npmjs.com/package/@toon-format/toon)
 [![License: MIT](https://img.shields.io/badge/license-MIT-fef3c0?labelColor=1b1b1f)](./LICENSE)
-
-This repository contains two complementary data formats optimized for AI applications:
-
-- **TOON (Token-Oriented Object Notation)** - Human-readable, token-efficient text format for LLM prompts
-- **BOON (Binary Object Notation)** - Memory-efficient binary format for cross-platform AI services
-
-Both formats share the JSON data model and provide lossless round-trip encoding.
-
-## Quick Comparison
-
-| Feature | TOON | BOON |
-|---------|------|------|
-| Format | Text | Binary |
-| Human Readable | ✅ Yes | ❌ No |
-| Token Efficient | ✅ Excellent | N/A |
-| Byte Efficient | ✅ Good | ✅ Excellent |
-| LLM Input | ✅ Optimized | ❌ Not suitable |
-| Machine-to-Machine | ✅ Good | ✅ Excellent |
-| Streaming Support | ✅ Yes | ✅ Yes |
-
-**Use TOON** when humans or LLMs need to read the data directly.
-**Use BOON** when you need maximum efficiency for machine-to-machine communication.
-
----
-
-# Token-Oriented Object Notation (TOON)
 
 **Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow. It's intended for *LLM input* as a drop-in, lossless representation of your existing JSON.
 
@@ -937,71 +911,6 @@ Comprehensive guides, references, and resources to help you get the most out of 
 - **Ruby:** [toon-ruby](https://github.com/andrepcg/toon-ruby)
 - **Swift:** [TOONEncoder](https://github.com/mattt/TOONEncoder)
 - **Kotlin:** [Kotlin-Toon Encoder/Decoder](https://github.com/vexpera-br/kotlin-toon)
-
----
-
-# Binary Object Notation (BOON)
-
-**Binary Object Notation (BOON)** is a memory-efficient, cross-platform binary encoding of the JSON data model, designed specifically for AI applications. BOON is the binary counterpart to TOON, sharing the same data model while optimizing for machine processing rather than human readability.
-
-## BOON Key Features
-
-- 🚀 **Memory Efficient**: Compact binary encoding with optimized type tags
-- 🌐 **Cross-Platform**: Consistent byte representation across all platforms using big-endian encoding
-- 🤖 **AI-Optimized**: Designed for efficient data exchange between AI systems and services
-- 🔄 **JSON Compatible**: Lossless round-trip encoding of the complete JSON data model
-- 📡 **Streaming Support**: Stream events for memory-efficient processing of large datasets
-
-## BOON Installation
-
-```bash
-# npm
-npm install @boon-format/boon
-
-# pnpm
-pnpm add @boon-format/boon
-```
-
-## BOON Quick Start
-
-```ts
-import { decode, encode } from '@boon-format/boon'
-
-// Encode JavaScript value to BOON binary
-const data = {
-  users: [
-    { id: 1, name: 'Alice', active: true },
-    { id: 2, name: 'Bob', active: false }
-  ]
-}
-
-const boonData = encode(data)
-// Returns Uint8Array containing BOON binary data
-
-// Decode BOON binary back to JavaScript
-const decoded = decode(boonData)
-// { users: [{ id: 1, name: 'Alice', active: true }, ...] }
-```
-
-## BOON Size Efficiency
-
-BOON achieves significant size reductions compared to JSON:
-
-| Data Type | JSON | BOON | Savings |
-|-----------|------|------|---------|
-| `true` | 4 bytes | 1 byte | 75% |
-| `false` | 5 bytes | 1 byte | 80% |
-| `null` | 4 bytes | 1 byte | 75% |
-| Integer 42 | 2 bytes | 2 bytes | 0% |
-| Integer 1000 | 4 bytes | 3 bytes | 25% |
-| Empty object `{}` | 2 bytes | 1 byte | 50% |
-| Empty array `[]` | 2 bytes | 1 byte | 50% |
-
-For arrays of objects (common in AI applications), BOON typically achieves 30-60% size reduction compared to JSON.
-
-See the [BOON README](./packages/boon/README.md) for full documentation.
-
----
 
 ## Credits
 
