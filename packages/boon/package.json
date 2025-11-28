@@ -1,0 +1,44 @@
+{
+  "name": "@boon-format/boon",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.23.0",
+  "description": "Binary Object Notation (BOON) – Memory-efficient, cross-platform binary encoding of JSON for AI applications",
+  "author": "Johann Schopplich <hello@johannschopplich.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/amilto-com/boon",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amilto-com/boon.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amilto-com/boon/issues"
+  },
+  "keywords": [
+    "boon",
+    "binary",
+    "format",
+    "ai",
+    "memory-efficient",
+    "cross-platform",
+    "data-format",
+    "json",
+    "serialization"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest"
+  },
+  "devDependencies": {}
+}

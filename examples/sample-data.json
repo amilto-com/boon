@@ -1,0 +1,79 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Alice Dupont",
+      "email": "alice@example.com",
+      "age": 28,
+      "active": true,
+      "roles": ["admin", "user"],
+      "metadata": {
+        "lastLogin": "2025-11-28T10:30:00Z",
+        "loginCount": 142,
+        "preferences": {
+          "theme": "dark",
+          "language": "fr",
+          "notifications": true
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Bob Martin",
+      "email": "bob@example.com",
+      "age": 35,
+      "active": true,
+      "roles": ["user"],
+      "metadata": {
+        "lastLogin": "2025-11-27T15:45:00Z",
+        "loginCount": 87,
+        "preferences": {
+          "theme": "light",
+          "language": "en",
+          "notifications": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "Charlie Lefebvre",
+      "email": "charlie@example.com",
+      "age": 42,
+      "active": false,
+      "roles": ["user", "moderator"],
+      "metadata": {
+        "lastLogin": "2025-10-15T08:20:00Z",
+        "loginCount": 234,
+        "preferences": {
+          "theme": "dark",
+          "language": "fr",
+          "notifications": true
+        }
+      }
+    }
+  ],
+  "stats": {
+    "totalUsers": 3,
+    "activeUsers": 2,
+    "averageAge": 35,
+    "roles": {
+      "admin": 1,
+      "user": 3,
+      "moderator": 1
+    }
+  },
+  "config": {
+    "appName": "User Management System",
+    "version": "2.5.1",
+    "features": {
+      "authentication": true,
+      "notifications": true,
+      "analytics": false
+    },
+    "limits": {
+      "maxUsers": 1000,
+      "maxSessionDuration": 86400,
+      "maxLoginAttempts": 5
+    }
+  }
+}
