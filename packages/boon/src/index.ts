@@ -177,6 +177,7 @@ function resolveEncodeOptions(options?: EncodeOptions): ResolvedEncodeOptions {
   return {
     includeHeader: options?.includeHeader ?? true,
     initialBufferSize: options?.initialBufferSize ?? DEFAULT_BUFFER_SIZE,
+    useStringTable: options?.useStringTable ?? true,
   }
 }
 

@@ -1,4 +1,5 @@
 import type { BinaryReader, BoonStreamEvent, ResolvedDecodeOptions } from '../types'
+import { COMMON_KEYS, COMMON_KEY_MAX, COMMON_KEY_MIN } from '../common-keys'
 import {
   FORMAT_VERSION,
   MAGIC_NUMBER,
@@ -7,9 +8,26 @@ import {
 import { createBinaryReader, textDecoder } from '../shared/buffer'
 
 /**
+ * Reads a varint from the reader.
+ */
+function readVarint(reader: BinaryReader): number {
+  let value = 0
+  let shift = 0
+  let byte = 0
+
+  do {
+    byte = reader.readUint8()
+    value |= (byte & 0x7F) << shift
+    shift += 7
+  } while (byte & 0x80)
+
+  return value
+}
+
+/**
  * Reads and validates the BOON header in streaming mode.
  */
-function* readHeaderEvents(reader: BinaryReader): Generator<BoonStreamEvent> {
+function* readHeaderEvents(reader: BinaryReader): Generator<BoonStreamEvent, string[] | null> {
   const magic = reader.readBytes(4)
   if (magic[0] !== MAGIC_NUMBER[0]
     || magic[1] !== MAGIC_NUMBER[1]
@@ -18,12 +36,38 @@ function* readHeaderEvents(reader: BinaryReader): Generator<BoonStreamEvent> {
     throw new SyntaxError('Invalid BOON magic number')
   }
 
-  const version = reader.readUint8()
-  if (version > FORMAT_VERSION) {
-    throw new SyntaxError(`Unsupported BOON version: ${version}`)
+  const firstByte = reader.readUint8()
+  
+  // Check if this is a string table header
+  if (firstByte === TYPE_TAG.HEADER_WITH_STRING_TABLE) {
+    const version = reader.readUint8()
+    if (version > FORMAT_VERSION) {
+      throw new SyntaxError(`Unsupported BOON version: ${version}`)
+    }
+    
+    // Read string table
+    const keyCount = readVarint(reader)
+    const keys: string[] = []
+    
+    for (let i = 0; i < keyCount; i++) {
+      const length = readVarint(reader)
+      const bytes = reader.readBytes(length)
+      keys.push(textDecoder.decode(bytes))
+    }
+    
+    yield { type: 'header', version }
+    return keys
   }
-
-  yield { type: 'header', version }
+  else {
+    // Regular header without string table
+    const version = firstByte
+    if (version > FORMAT_VERSION) {
+      throw new SyntaxError(`Unsupported BOON version: ${version}`)
+    }
+    
+    yield { type: 'header', version }
+    return null
+  }
 }
 
 /**
@@ -53,20 +97,33 @@ function readString(reader: BinaryReader, tag: number): string {
 }
 
 /**
- * Reads a key string.
+ * Reads a key string with common keys dictionary support.
  */
 function readKeyString(reader: BinaryReader): string {
-  const lengthByte = reader.readUint8()
+  const firstByte = reader.readUint8()
+  
+  // Check if this is a common key (0x80-0xFF)
+  if (firstByte >= COMMON_KEY_MIN && firstByte <= COMMON_KEY_MAX) {
+    const keyIndex = firstByte - COMMON_KEY_MIN
+    const key = COMMON_KEYS[keyIndex]
+    if (!key) {
+      throw new SyntaxError(`Invalid common key index: ${keyIndex}`)
+    }
+    return key
+  }
+
+  // Otherwise, it's a length-prefixed string
   let length: number
 
-  if (lengthByte === 254) {
+  if (firstByte === 254) {
     length = reader.readUint16()
   }
-  else if (lengthByte === 255) {
+  else if (firstByte === 255) {
     length = reader.readUint32()
   }
   else {
-    length = lengthByte
+    // 1-byte length (0-127)
+    length = firstByte
   }
 
   const bytes = reader.readBytes(length)
@@ -114,7 +171,7 @@ function getObjectKeyCount(reader: BinaryReader, tag: number): number {
 /**
  * Streams BOON events from a single value.
  */
-function* streamValue(reader: BinaryReader): Generator<BoonStreamEvent> {
+function* streamValue(reader: BinaryReader, keyTable?: string[] | null): Generator<BoonStreamEvent> {
   const tag = reader.readUint8()
 
   // Null
@@ -191,7 +248,7 @@ function* streamValue(reader: BinaryReader): Generator<BoonStreamEvent> {
     const length = getArrayLength(reader, tag)
     yield { type: 'startArray', length }
     for (let i = 0; i < length; i++) {
-      yield* streamValue(reader)
+      yield* streamValue(reader, keyTable)
     }
     yield { type: 'endArray' }
     return
@@ -205,9 +262,23 @@ function* streamValue(reader: BinaryReader): Generator<BoonStreamEvent> {
     const keyCount = getObjectKeyCount(reader, tag)
     yield { type: 'startObject', keyCount }
     for (let i = 0; i < keyCount; i++) {
-      const key = readKeyString(reader)
+      let key: string
+      
+      if (keyTable) {
+        // Read varint key index
+        const keyIndex = readVarint(reader)
+        key = keyTable[keyIndex]
+        if (key === undefined) {
+          throw new SyntaxError(`Invalid key index: ${keyIndex}`)
+        }
+      }
+      else {
+        // Read full key string
+        key = readKeyString(reader)
+      }
+      
       yield { type: 'key', key }
-      yield* streamValue(reader)
+      yield* streamValue(reader, keyTable)
     }
     yield { type: 'endObject' }
     return
@@ -230,11 +301,23 @@ export function* decodeStreamSync(
 
   const reader = createBinaryReader(data)
 
+  let keyTable: string[] | null = null
+  
   if (resolvedOptions.expectHeader) {
-    yield* readHeaderEvents(reader)
+    const headerGen = readHeaderEvents(reader)
+    let headerResult = headerGen.next()
+    
+    // Yield header event
+    while (!headerResult.done) {
+      yield headerResult.value
+      headerResult = headerGen.next()
+    }
+    
+    // Get key table from final return value
+    keyTable = headerResult.value ?? null
   }
 
-  yield* streamValue(reader)
+  yield* streamValue(reader, keyTable)
 }
 
 /**

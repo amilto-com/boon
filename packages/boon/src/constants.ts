@@ -57,6 +57,8 @@ export const TYPE_TAG = {
   OBJECT_SHORT: 0x51, // 1-255 keys (1-byte count)
   OBJECT_MEDIUM: 0x52, // 256-65535 keys (2-byte count)
   OBJECT_LONG: 0x53, // > 65535 keys (4-byte count)
+  // Header with string table (optimization)
+  HEADER_WITH_STRING_TABLE: 0x60,
 } as const
 
 export type TypeTag = typeof TYPE_TAG[keyof typeof TYPE_TAG]

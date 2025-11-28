@@ -15,7 +15,86 @@ import {
   UINT16_MAX,
   UINT32_MAX,
 } from '../constants'
+import { COMMON_KEYS_MAP, COMMON_KEY_MIN } from '../common-keys'
 import { createGrowableBuffer, textEncoder } from '../shared/buffer'
+
+/**
+ * Collects all unique object keys from a JSON value.
+ * Used for string table optimization.
+ */
+function collectKeys(value: JsonValue, keys: Set<string> = new Set()): Set<string> {
+  if (value === null || typeof value !== 'object') {
+    return keys
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectKeys(item, keys)
+    }
+  }
+  else {
+    const obj = value as JsonObject
+    for (const key of Object.keys(obj)) {
+      keys.add(key)
+      collectKeys(obj[key]!, keys)
+    }
+  }
+
+  return keys
+}
+
+/**
+ * Writes a varint (variable-length integer) for key indexes.
+ */
+function writeVarint(buf: GrowableBuffer, value: number): void {
+  if (value < 128) {
+    buf.ensureCapacity(1)
+    buf.buffer[buf.offset++] = value
+  }
+  else if (value < 16384) {
+    buf.ensureCapacity(2)
+    buf.buffer[buf.offset++] = (value & 0x7F) | 0x80
+    buf.buffer[buf.offset++] = value >>> 7
+  }
+  else if (value < 2097152) {
+    buf.ensureCapacity(3)
+    buf.buffer[buf.offset++] = (value & 0x7F) | 0x80
+    buf.buffer[buf.offset++] = ((value >>> 7) & 0x7F) | 0x80
+    buf.buffer[buf.offset++] = value >>> 14
+  }
+  else {
+    buf.ensureCapacity(4)
+    buf.buffer[buf.offset++] = (value & 0x7F) | 0x80
+    buf.buffer[buf.offset++] = ((value >>> 7) & 0x7F) | 0x80
+    buf.buffer[buf.offset++] = ((value >>> 14) & 0x7F) | 0x80
+    buf.buffer[buf.offset++] = value >>> 21
+  }
+}
+
+/**
+ * Writes the string table header.
+ */
+function writeStringTable(buf: GrowableBuffer, keys: string[]): void {
+  writeTag(buf, TYPE_TAG.HEADER_WITH_STRING_TABLE)
+  
+  // Version byte
+  buf.ensureCapacity(1)
+  buf.buffer[buf.offset++] = FORMAT_VERSION
+  
+  // Number of keys
+  writeVarint(buf, keys.length)
+  
+  // Write each key as a string
+  for (const key of keys) {
+    const bytes = textEncoder.encode(key)
+    const length = bytes.length
+    
+    writeVarint(buf, length)
+    buf.ensureCapacity(length)
+    buf.buffer.set(bytes, buf.offset)
+    buf.offset += length
+  }
+}
 
 /**
  * Writes the BOON header (magic number + version).
@@ -168,9 +247,95 @@ function writeString(buf: GrowableBuffer, value: string): void {
 }
 
 /**
- * Writes an array value.
+ * Writes an object value with string table (using key indexes).
  */
-function writeArray(buf: GrowableBuffer, value: JsonArray, options: ResolvedEncodeOptions): void {
+function writeObjectWithKeyMap(
+  buf: GrowableBuffer,
+  value: JsonObject,
+  options: ResolvedEncodeOptions,
+  keyMap: Map<string, number>,
+): void {
+  const keys = Object.keys(value)
+  const keyCount = keys.length
+
+  if (keyCount === 0) {
+    writeTag(buf, TYPE_TAG.OBJECT_EMPTY)
+    return
+  }
+
+  // Choose optimal key count encoding
+  if (keyCount <= MAX_SHORT_LENGTH) {
+    writeTag(buf, TYPE_TAG.OBJECT_SHORT)
+    buf.ensureCapacity(1)
+    buf.buffer[buf.offset++] = keyCount
+  }
+  else if (keyCount <= MAX_MEDIUM_LENGTH) {
+    writeTag(buf, TYPE_TAG.OBJECT_MEDIUM)
+    buf.ensureCapacity(2)
+    buf.view.setUint16(buf.offset, keyCount, false)
+    buf.offset += 2
+  }
+  else {
+    writeTag(buf, TYPE_TAG.OBJECT_LONG)
+    buf.ensureCapacity(4)
+    buf.view.setUint32(buf.offset, keyCount, false)
+    buf.offset += 4
+  }
+
+  // Write key-value pairs using indexes
+  for (const key of keys) {
+    const keyIndex = keyMap.get(key)!
+    writeVarint(buf, keyIndex) // Write key index instead of full string
+    writeValueWithKeyMap(buf, value[key]!, options, keyMap)
+  }
+}
+
+/**
+ * Writes any JSON value with string table support.
+ */
+function writeValueWithKeyMap(
+  buf: GrowableBuffer,
+  value: JsonValue,
+  options: ResolvedEncodeOptions,
+  keyMap: Map<string, number>,
+): void {
+  if (value === null) {
+    writeNull(buf)
+    return
+  }
+
+  switch (typeof value) {
+    case 'boolean':
+      writeBoolean(buf, value)
+      break
+    case 'number':
+      writeNumber(buf, value)
+      break
+    case 'string':
+      writeString(buf, value)
+      break
+    case 'object':
+      if (Array.isArray(value)) {
+        writeArray(buf, value, options, keyMap)
+      }
+      else {
+        writeObjectWithKeyMap(buf, value as JsonObject, options, keyMap)
+      }
+      break
+    default:
+      throw new TypeError(`Unsupported value type: ${typeof value}`)
+  }
+}
+
+/**
+ * Writes an array value with string table support.
+ */
+function writeArray(
+  buf: GrowableBuffer,
+  value: JsonArray,
+  options: ResolvedEncodeOptions,
+  keyMap?: Map<string, number>,
+): void {
   const length = value.length
 
   if (length === 0) {
@@ -178,31 +343,32 @@ function writeArray(buf: GrowableBuffer, value: JsonArray, options: ResolvedEnco
     return
   }
 
-  // Choose optimal length encoding
   if (length <= MAX_SHORT_LENGTH) {
-    // Short array: 1-byte length
     writeTag(buf, TYPE_TAG.ARRAY_SHORT)
     buf.ensureCapacity(1)
     buf.buffer[buf.offset++] = length
   }
   else if (length <= MAX_MEDIUM_LENGTH) {
-    // Medium array: 2-byte length
     writeTag(buf, TYPE_TAG.ARRAY_MEDIUM)
     buf.ensureCapacity(2)
-    buf.view.setUint16(buf.offset, length, false) // big-endian
+    buf.view.setUint16(buf.offset, length, false)
     buf.offset += 2
   }
   else {
-    // Long array: 4-byte length
     writeTag(buf, TYPE_TAG.ARRAY_LONG)
     buf.ensureCapacity(4)
-    buf.view.setUint32(buf.offset, length, false) // big-endian
+    buf.view.setUint32(buf.offset, length, false)
     buf.offset += 4
   }
 
   // Write array elements
   for (const item of value) {
-    writeValue(buf, item, options)
+    if (keyMap) {
+      writeValueWithKeyMap(buf, item, options, keyMap)
+    }
+    else {
+      writeValue(buf, item, options)
+    }
   }
 }
 
@@ -251,15 +417,25 @@ function writeObject(buf: GrowableBuffer, value: JsonObject, options: ResolvedEn
 
 /**
  * Writes a key string (without type tag - keys are always strings).
- * Uses a simple length prefix encoding.
+ * Uses common keys dictionary (0x80-0xFF) for frequent keys, otherwise length prefix encoding.
  */
 function writeKeyString(buf: GrowableBuffer, value: string): void {
+  // Check if key is in common keys dictionary
+  const commonKeyId = COMMON_KEYS_MAP.get(value)
+  if (commonKeyId !== undefined) {
+    // Write single byte for common key
+    buf.ensureCapacity(1)
+    buf.buffer[buf.offset++] = commonKeyId
+    return
+  }
+
+  // Not a common key, encode as UTF-8 string
   const bytes = textEncoder.encode(value)
   const length = bytes.length
 
   // Use varint-style length encoding for keys
-  if (length <= 253) {
-    // 1-byte length (0-253)
+  // 0-127: 1-byte length (avoid conflict with common keys 0x80-0xFF)
+  if (length <= 127) {
     buf.ensureCapacity(1 + length)
     buf.buffer[buf.offset++] = length
   }
@@ -320,6 +496,38 @@ export function writeValue(buf: GrowableBuffer, value: JsonValue, options: Resol
 export function encodeValue(value: JsonValue, options: ResolvedEncodeOptions): Uint8Array {
   const buf = createGrowableBuffer(options.initialBufferSize)
 
+  // Check if we should use string table optimization
+  if (options.useStringTable) {
+    // Collect all unique keys
+    const keys = Array.from(collectKeys(value))
+    
+    // Only use string table if it saves space
+    // Rough estimate: header overhead vs key repetition savings
+    const headerSize = 10 + keys.reduce((sum, k) => sum + k.length + 2, 0)
+    const repetitionSavings = estimateRepetitionSavings(value, keys)
+    
+    if (repetitionSavings > headerSize) {
+      // Write magic number if header requested
+      if (options.includeHeader) {
+        buf.ensureCapacity(4)
+        buf.buffer.set(MAGIC_NUMBER, buf.offset)
+        buf.offset += 4
+      }
+      
+      // Write string table header
+      writeStringTable(buf, keys)
+      
+      // Create key -> index map
+      const keyMap = new Map(keys.map((k, i) => [k, i]))
+      
+      // Encode value using key indexes
+      writeValueWithKeyMap(buf, value, options, keyMap)
+      
+      return buf.getResult()
+    }
+  }
+
+  // Standard encoding without string table
   if (options.includeHeader) {
     writeHeader(buf)
   }
@@ -327,6 +535,51 @@ export function encodeValue(value: JsonValue, options: ResolvedEncodeOptions): U
   writeValue(buf, value, options)
 
   return buf.getResult()
+}
+
+/**
+ * Estimates potential savings from using string table.
+ */
+function estimateRepetitionSavings(value: JsonValue, keys: string[]): number {
+  const keyUsage = new Map<string, number>()
+  
+  function countKeys(val: JsonValue): void {
+    if (val === null || typeof val !== 'object') {
+      return
+    }
+    
+    if (Array.isArray(val)) {
+      for (const item of val) {
+        countKeys(item)
+      }
+    }
+    else {
+      for (const key of Object.keys(val)) {
+        keyUsage.set(key, (keyUsage.get(key) || 0) + 1)
+        countKeys(val[key]!)
+      }
+    }
+  }
+  
+  countKeys(value)
+  
+  // Calculate total key usage
+  let totalKeyBytes = 0
+  for (const [key, count] of keyUsage) {
+    // Cost sans string table: chaque occurrence = length_prefix + bytes
+    const costWithoutTable = count * (1 + key.length)
+    totalKeyBytes += costWithoutTable
+  }
+  
+  // If more than 50% of keys are used only once, probably not worth it
+  const singleUseKeys = Array.from(keyUsage.values()).filter(c => c === 1).length
+  if (singleUseKeys > keys.length * 0.5) {
+    return -1000 // Force disable
+  }
+  
+  // Rough calculation: if we save more than 10%, use it
+  const avgSavingsPerKey = totalKeyBytes / Array.from(keyUsage.values()).reduce((a, b) => a + b, 0)
+  return avgSavingsPerKey > 2 ? 1000 : -1000
 }
 
 /**

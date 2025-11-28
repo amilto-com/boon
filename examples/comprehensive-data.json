@@ -1,0 +1,484 @@
+{
+  "primitives": {
+    "null_value": null,
+    "boolean_true": true,
+    "boolean_false": false,
+    "integer_zero": 0,
+    "integer_positive_small": 42,
+    "integer_negative_small": -42,
+    "integer_int8_max": 127,
+    "integer_int8_min": -128,
+    "integer_int16_max": 32767,
+    "integer_int16_min": -32768,
+    "integer_int32_max": 2147483647,
+    "integer_int32_min": -2147483648,
+    "float_simple": 3.14159,
+    "float_negative": -273.15,
+    "float_very_small": 0.000001,
+    "float_very_large": 1234567890.123456,
+    "float_scientific": 1.23e-10,
+    "string_empty": "",
+    "string_simple": "hello",
+    "string_with_spaces": "hello world",
+    "string_with_numbers": "test123",
+    "string_unicode": "こんにちは世界",
+    "string_emoji": "Hello 👋 World 🌍 Test 🎉",
+    "string_special_chars": "Line1\nLine2\tTabbed\r\nWindows",
+    "string_quotes": "She said \"Hello!\"",
+    "string_backslash": "C:\\Users\\path\\to\\file",
+    "string_long": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
+  },
+  "arrays": {
+    "array_empty": [],
+    "array_numbers": [1, 2, 3, 4, 5, 10, 20, 30, 100, 1000],
+    "array_strings": ["apple", "banana", "cherry", "date", "elderberry"],
+    "array_booleans": [true, false, true, true, false],
+    "array_mixed": [1, "two", true, null, 3.14, "five"],
+    "array_nested": [[1, 2], [3, 4], [5, 6, 7], [8, 9, 10]],
+    "array_deep_nested": [[[1, 2], [3, 4]], [[5, 6], [7, 8]]],
+    "array_objects": [
+      { "id": 1, "name": "Alice" },
+      { "id": 2, "name": "Bob" },
+      { "id": 3, "name": "Charlie" }
+    ],
+    "array_large": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+  },
+  "objects": {
+    "object_empty": {},
+    "object_simple": { "key": "value" },
+    "object_multiple": {
+      "first": "1st",
+      "second": "2nd",
+      "third": "3rd"
+    },
+    "object_nested": {
+      "level1": {
+        "level2": {
+          "level3": {
+            "level4": {
+              "deep": "value"
+            }
+          }
+        }
+      }
+    },
+    "object_with_arrays": {
+      "numbers": [1, 2, 3],
+      "strings": ["a", "b", "c"]
+    }
+  },
+  "complex_structures": {
+    "user_database": {
+      "users": [
+        {
+          "id": 1001,
+          "username": "alice_wonder",
+          "email": "alice@wonderland.com",
+          "profile": {
+            "firstName": "Alice",
+            "lastName": "Wonderland",
+            "age": 28,
+            "gender": "female",
+            "avatar": "https://example.com/avatars/alice.jpg",
+            "bio": "Curious explorer of digital realms 🔍",
+            "verified": true
+          },
+          "settings": {
+            "theme": "dark",
+            "language": "en-US",
+            "timezone": "America/New_York",
+            "notifications": {
+              "email": true,
+              "push": true,
+              "sms": false
+            },
+            "privacy": {
+              "profileVisible": true,
+              "showEmail": false,
+              "allowMessages": true
+            }
+          },
+          "activity": {
+            "createdAt": "2023-01-15T10:30:00Z",
+            "lastLogin": "2025-11-28T08:45:00Z",
+            "loginCount": 342,
+            "postsCount": 127,
+            "followersCount": 1523,
+            "followingCount": 456
+          },
+          "roles": ["user", "moderator"],
+          "permissions": ["read", "write", "moderate"],
+          "metadata": {
+            "device": "mobile",
+            "platform": "iOS",
+            "version": "17.1",
+            "lastIP": "192.168.1.100"
+          }
+        },
+        {
+          "id": 1002,
+          "username": "bob_builder",
+          "email": "bob@construction.com",
+          "profile": {
+            "firstName": "Bob",
+            "lastName": "Builder",
+            "age": 35,
+            "gender": "male",
+            "avatar": "https://example.com/avatars/bob.jpg",
+            "bio": "Can we fix it? Yes we can! 🔨",
+            "verified": false
+          },
+          "settings": {
+            "theme": "light",
+            "language": "en-GB",
+            "timezone": "Europe/London",
+            "notifications": {
+              "email": false,
+              "push": true,
+              "sms": true
+            },
+            "privacy": {
+              "profileVisible": true,
+              "showEmail": true,
+              "allowMessages": false
+            }
+          },
+          "activity": {
+            "createdAt": "2024-03-20T14:15:00Z",
+            "lastLogin": "2025-11-27T19:30:00Z",
+            "loginCount": 89,
+            "postsCount": 45,
+            "followersCount": 234,
+            "followingCount": 123
+          },
+          "roles": ["user"],
+          "permissions": ["read", "write"],
+          "metadata": {
+            "device": "desktop",
+            "platform": "Windows",
+            "version": "11",
+            "lastIP": "10.0.0.50"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "id": 501,
+          "name": "Developers",
+          "description": "Software development enthusiasts",
+          "memberCount": 1250,
+          "isPublic": true,
+          "tags": ["coding", "programming", "software", "tech"],
+          "createdAt": "2023-05-10T12:00:00Z"
+        },
+        {
+          "id": 502,
+          "name": "Designers",
+          "description": "Creative design professionals",
+          "memberCount": 834,
+          "isPublic": true,
+          "tags": ["design", "graphics", "ui", "ux"],
+          "createdAt": "2023-06-15T09:30:00Z"
+        }
+      ]
+    },
+    "analytics_data": {
+      "daily_metrics": [
+        { "date": "2025-11-25", "visits": 1523, "pageviews": 4892, "bounce_rate": 0.42, "avg_session": 245.5 },
+        { "date": "2025-11-26", "visits": 1687, "pageviews": 5234, "bounce_rate": 0.38, "avg_session": 267.8 },
+        { "date": "2025-11-27", "visits": 1456, "pageviews": 4567, "bounce_rate": 0.45, "avg_session": 223.4 },
+        { "date": "2025-11-28", "visits": 1789, "pageviews": 5678, "bounce_rate": 0.35, "avg_session": 289.2 }
+      ],
+      "traffic_sources": {
+        "direct": 3456,
+        "search": 2341,
+        "social": 1789,
+        "referral": 987,
+        "email": 456,
+        "other": 234
+      },
+      "top_pages": [
+        { "path": "/home", "views": 12345 },
+        { "path": "/products", "views": 8901 },
+        { "path": "/about", "views": 5678 },
+        { "path": "/contact", "views": 3456 },
+        { "path": "/blog", "views": 2345 }
+      ]
+    },
+    "configuration": {
+      "app": {
+        "name": "MyApplication",
+        "version": "3.2.1",
+        "environment": "production",
+        "debug": false,
+        "maintenance_mode": false
+      },
+      "server": {
+        "host": "api.example.com",
+        "port": 443,
+        "protocol": "https",
+        "timeout": 30000,
+        "max_connections": 1000,
+        "keepalive": true
+      },
+      "database": {
+        "primary": {
+          "host": "db-primary.example.com",
+          "port": 5432,
+          "name": "production_db",
+          "pool_size": 50,
+          "ssl": true
+        },
+        "replica": {
+          "host": "db-replica.example.com",
+          "port": 5432,
+          "name": "production_db",
+          "pool_size": 30,
+          "ssl": true
+        }
+      },
+      "cache": {
+        "redis": {
+          "host": "cache.example.com",
+          "port": 6379,
+          "ttl": 3600,
+          "max_memory": "2gb"
+        }
+      },
+      "features": {
+        "authentication": true,
+        "two_factor": true,
+        "social_login": true,
+        "api_rate_limiting": true,
+        "content_delivery": true,
+        "real_time_updates": false
+      }
+    },
+    "graph_structure": {
+      "nodes": [
+        { "id": "n1", "label": "Node 1", "type": "start", "x": 0, "y": 0 },
+        { "id": "n2", "label": "Node 2", "type": "process", "x": 100, "y": 50 },
+        { "id": "n3", "label": "Node 3", "type": "process", "x": 100, "y": -50 },
+        { "id": "n4", "label": "Node 4", "type": "decision", "x": 200, "y": 0 },
+        { "id": "n5", "label": "Node 5", "type": "end", "x": 300, "y": 0 }
+      ],
+      "edges": [
+        { "from": "n1", "to": "n2", "weight": 1.0, "label": "path A" },
+        { "from": "n1", "to": "n3", "weight": 1.5, "label": "path B" },
+        { "from": "n2", "to": "n4", "weight": 2.0, "label": "merge" },
+        { "from": "n3", "to": "n4", "weight": 1.8, "label": "merge" },
+        { "from": "n4", "to": "n5", "weight": 1.2, "label": "complete" }
+      ],
+      "metadata": {
+        "created": "2025-11-28T10:00:00Z",
+        "author": "system",
+        "version": 3
+      }
+    },
+    "hierarchical_tree": {
+      "root": {
+        "id": "root",
+        "name": "Organization",
+        "children": [
+          {
+            "id": "eng",
+            "name": "Engineering",
+            "children": [
+              {
+                "id": "eng-fe",
+                "name": "Frontend",
+                "children": [
+                  { "id": "eng-fe-1", "name": "Team Alpha", "size": 5 },
+                  { "id": "eng-fe-2", "name": "Team Beta", "size": 4 }
+                ]
+              },
+              {
+                "id": "eng-be",
+                "name": "Backend",
+                "children": [
+                  { "id": "eng-be-1", "name": "Team Gamma", "size": 6 },
+                  { "id": "eng-be-2", "name": "Team Delta", "size": 5 }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "sales",
+            "name": "Sales",
+            "children": [
+              { "id": "sales-1", "name": "North America", "size": 12 },
+              { "id": "sales-2", "name": "Europe", "size": 10 },
+              { "id": "sales-3", "name": "Asia Pacific", "size": 8 }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "edge_cases": {
+    "empty_structures": {
+      "empty_string": "",
+      "empty_array": [],
+      "empty_object": {}
+    },
+    "special_numbers": {
+      "zero": 0,
+      "one": 1,
+      "minus_one": -1,
+      "max_safe_integer": 9007199254740991,
+      "min_safe_integer": -9007199254740991
+    },
+    "long_arrays": {
+      "array_100": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99]
+    },
+    "deeply_nested": {
+      "l1": {
+        "l2": {
+          "l3": {
+            "l4": {
+              "l5": {
+                "l6": {
+                  "l7": {
+                    "l8": {
+                      "l9": {
+                        "l10": {
+                          "value": "deeply nested value",
+                          "depth": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "mixed_content": [
+      "string",
+      123,
+      true,
+      null,
+      { "nested": "object" },
+      [1, 2, 3],
+      3.14,
+      false,
+      "",
+      0
+    ]
+  },
+  "real_world_examples": {
+    "ecommerce_order": {
+      "orderId": "ORD-2025-11-28-00001",
+      "orderDate": "2025-11-28T12:34:56Z",
+      "status": "processing",
+      "customer": {
+        "customerId": "CUST-12345",
+        "name": "Jean Dupont",
+        "email": "jean.dupont@example.fr",
+        "phone": "(+33) 6 12 34 56 78",
+        "shippingAddress": {
+          "street": "123 Rue de la Paix",
+          "city": "Paris",
+          "postalCode": "75001",
+          "country": "France"
+        },
+        "billingAddress": {
+          "street": "123 Rue de la Paix",
+          "city": "Paris",
+          "postalCode": "75001",
+          "country": "France"
+        }
+      },
+      "items": [
+        {
+          "sku": "LAPTOP-X1-2024",
+          "name": "Professional Laptop X1",
+          "quantity": 1,
+          "unitPrice": 1299.99,
+          "discount": 0.1,
+          "tax": 0.2,
+          "total": 1403.99
+        },
+        {
+          "sku": "MOUSE-W5",
+          "name": "Wireless Mouse W5",
+          "quantity": 2,
+          "unitPrice": 49.99,
+          "discount": 0,
+          "tax": 0.2,
+          "total": 119.98
+        }
+      ],
+      "payment": {
+        "method": "credit_card",
+        "cardLast4": "1234",
+        "cardType": "Visa",
+        "transactionId": "TXN-ABC-123-XYZ",
+        "amount": 1523.97,
+        "currency": "EUR",
+        "status": "completed"
+      },
+      "shipping": {
+        "method": "express",
+        "carrier": "DHL",
+        "trackingNumber": "DHL123456789FR",
+        "estimatedDelivery": "2025-11-30",
+        "cost": 15.00
+      },
+      "totals": {
+        "subtotal": 1399.97,
+        "discount": 130.00,
+        "tax": 254.00,
+        "shipping": 15.00,
+        "total": 1538.97
+      }
+    },
+    "api_response": {
+      "meta": {
+        "version": "2.0",
+        "timestamp": "2025-11-28T12:45:00Z",
+        "requestId": "req_abc123xyz",
+        "duration": 145,
+        "rateLimit": {
+          "limit": 1000,
+          "remaining": 847,
+          "reset": 1732800000
+        }
+      },
+      "data": {
+        "results": [
+          {
+            "id": 1,
+            "title": "First Result",
+            "score": 0.95,
+            "highlighted": true
+          },
+          {
+            "id": 2,
+            "title": "Second Result",
+            "score": 0.87,
+            "highlighted": false
+          },
+          {
+            "id": 3,
+            "title": "Third Result",
+            "score": 0.76,
+            "highlighted": false
+          }
+        ],
+        "pagination": {
+          "page": 1,
+          "perPage": 10,
+          "total": 234,
+          "totalPages": 24,
+          "hasNext": true,
+          "hasPrev": false
+        }
+      },
+      "errors": null,
+      "warnings": []
+    }
+  }
+}

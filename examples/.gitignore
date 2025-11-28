@@ -1,0 +1,14 @@
+# Generated files by scripts
+sample-data-generated.toon
+sample-data-roundtrip.json
+comprehensive-data.toon
+comprehensive-data.boon
+debug-*.json
+debug-*.txt
+output.toon
+output.json
+
+# Generated compressed files
+*.gz
+*.br
+*.zip

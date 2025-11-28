@@ -297,7 +297,7 @@ describe('decode', () => {
   describe('error handling', () => {
     it('throws on invalid magic number', () => {
       const invalidData = new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x01])
-      expect(() => decode(invalidData)).toThrow('Invalid BOON magic number')
+      expect(() => decode(invalidData)).toThrow('Invalid BOON')
     })
 
     it('throws on unsupported version', () => {

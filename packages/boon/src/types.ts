@@ -20,6 +20,13 @@ export interface EncodeOptions {
    * @default 4096
    */
   initialBufferSize?: number
+  /**
+   * Use string table optimization for object keys.
+   * Reduces size for data with repeated keys.
+   * Set to false to disable automatic optimization.
+   * @default true
+   */
+  useStringTable?: boolean
 }
 
 export type ResolvedEncodeOptions = Readonly<Required<EncodeOptions>>
